@@ -1,0 +1,41 @@
+00000005  // addi x5, x0, 5
+fffffffd  // addi x6, x0, -3
+00000001  // andi x7, x5, 3
+00000007  // ori x8, x5, 2
+00000006  // xori x9, x5, 3
+00000001  // slti x10, x6, 0
+00000000  // sltiu x11, x6, 5
+00000014  // slli x12, x5, 2
+0fffffff  // srli x13, x6, 4  (logical)
+ffffffff  // srai x14, x6, 4  (arithmetic, Python >> on negative int already is arithmetic)
+00000002  // add x15, x5, x6
+00000008  // sub x16, x5, x6
+00000005  // and x17, x5, x8
+00000007  // or x18, x5, x9
+00000003  // xor x19, x5, x9
+0000000a  // sll x20, x5, x7   (x7 = 1)
+7ffffffe  // srl x21, x6, x7   (logical, x7 = 1)
+fffffffe  // sra x22, x6, x7   (arithmetic, x7 = 1)
+00000001  // slt x23, x6, x5
+00000000  // sltu x24, x6, x5
+12345000  // lui x25, 0x12345
+00001100  // auipc x26, 1
+ffffffaa  // lw x29, 0(x27)  -- full word read back
+ffffffaa  // lb x29, 0(x27)  -- sign-extended byte
+000000aa  // lbu x29, 0(x27)  -- zero-extended byte
+000002ab  // lh x31, 8(x27)  -- sign-extended halfword
+000002ab  // lhu x31, 8(x27)  -- zero-extended halfword
+00000065  // branch taken
+000000c9  // branch not taken
+00000065  // branch taken
+000000c9  // branch not taken
+00000065  // branch taken
+000000c9  // branch not taken
+00000065  // branch taken
+000000c9  // branch not taken
+00000065  // branch taken
+000000c9  // branch not taken
+00000065  // branch taken
+000000c9  // branch not taken
+00000001  // x20 after returning to call_site
+00000001  // x21 inside subroutine

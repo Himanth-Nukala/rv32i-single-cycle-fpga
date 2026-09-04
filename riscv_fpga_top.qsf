@@ -1,0 +1,62 @@
+set_global_assignment -name FAMILY "Cyclone IV E"
+set_global_assignment -name DEVICE EP4CE22F17C6
+set_global_assignment -name TOP_LEVEL_ENTITY riscv_fpga_top
+
+set_global_assignment -name VERILOG_FILE alu.v
+set_global_assignment -name VERILOG_FILE alu_decoder.v
+set_global_assignment -name VERILOG_FILE main_decoder.v
+set_global_assignment -name VERILOG_FILE reg_file.v
+set_global_assignment -name VERILOG_FILE imm_gen.v
+set_global_assignment -name VERILOG_FILE branch_comp.v
+set_global_assignment -name VERILOG_FILE program_counter.v
+set_global_assignment -name VERILOG_FILE instr_mem.v
+set_global_assignment -name VERILOG_FILE data_mem.v
+set_global_assignment -name VERILOG_FILE uart_tx.v
+set_global_assignment -name VERILOG_FILE uart_mmio.v
+set_global_assignment -name VERILOG_FILE riscv_top.v
+set_global_assignment -name VERILOG_FILE riscv_fpga_top.v
+
+# instr_mem.v / data_mem.v load hello_hw.hex / hello_data.hex with
+# $readmemh, read directly from this project directory -- Quartus bakes
+# their contents into the .sof's initial memory state at compile time,
+# exactly like Task 12's $readmemh-initialized ROM. No separate file
+# assignment is needed for them.
+
+# --- 50MHz clock ---
+set_location_assignment PIN_R8  -to CLOCK_50
+
+# --- push-buttons (KEY[0] = active-low reset) ---
+set_location_assignment PIN_J15 -to KEY[0]
+set_location_assignment PIN_E1  -to KEY[1]
+
+# --- LEDs (LED[0] = heartbeat) ---
+set_location_assignment PIN_A15 -to LED[0]
+set_location_assignment PIN_A13 -to LED[1]
+set_location_assignment PIN_B13 -to LED[2]
+set_location_assignment PIN_A11 -to LED[3]
+set_location_assignment PIN_D1  -to LED[4]
+set_location_assignment PIN_F3  -to LED[5]
+set_location_assignment PIN_B1  -to LED[6]
+set_location_assignment PIN_L3  -to LED[7]
+
+# --- UART, GPIO_0 header, same pins used for Project 3's UART bus ---
+# CH340G TXD -> here (FPGA receives on this pin; unused by this CPU today)
+set_location_assignment PIN_D3  -to GPIO_0_RX
+# here -> CH340G RXD (FPGA transmits on this pin)
+set_location_assignment PIN_C3  -to GPIO_0_TX
+
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLOCK_50
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to KEY[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to KEY[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0_RX
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0_TX
+
+set_global_assignment -name LAST_QUARTUS_VERSION "20.1.1 Lite Edition"
