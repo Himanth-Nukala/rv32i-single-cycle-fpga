@@ -63,17 +63,17 @@ module tb_riscv_top;
 
     // Reads one 32-bit checkpoint word directly out of the DUT's data
     // memory array. This is the testbench reaching in with a hierarchical
-    // reference (`dut.u_data_mem.mem`) rather than going through the CPU's
-    // own load instructions -- deliberately, so that a bug in LW itself
-    // can't accidentally "hide" a bug in what SW actually wrote.
+    // reference (`dut.u_memory.u_data_mem.mem`) rather than going through
+    // the CPU's own load instructions -- deliberately, so that a bug in LW
+    // itself can't accidentally "hide" a bug in what SW actually wrote.
     function automatic [31:0] read_checkpoint(input integer index);
         reg [31:0] byte_addr;
         begin
             byte_addr = index * 4;
-            read_checkpoint = { dut.u_data_mem.mem[byte_addr+3],
-                                 dut.u_data_mem.mem[byte_addr+2],
-                                 dut.u_data_mem.mem[byte_addr+1],
-                                 dut.u_data_mem.mem[byte_addr]   };
+            read_checkpoint = { dut.u_memory.u_data_mem.mem[byte_addr+3],
+                                 dut.u_memory.u_data_mem.mem[byte_addr+2],
+                                 dut.u_memory.u_data_mem.mem[byte_addr+1],
+                                 dut.u_memory.u_data_mem.mem[byte_addr]   };
         end
     endfunction
 
@@ -105,7 +105,7 @@ module tb_riscv_top;
         // first means every checkpoint is a genuine proof that the CPU
         // wrote it, not just that memory happened to start out agreeing.
         for (k = 0; k < NUM_CHECKPOINTS * 4; k = k + 1)
-            dut.u_data_mem.mem[k] = 8'hA5;
+            dut.u_memory.u_data_mem.mem[k] = 8'hA5;
 
         // Hold reset for a couple of cycles, then release it -- the CPU
         // starts fetching from address 0 the instant rst_n goes high.

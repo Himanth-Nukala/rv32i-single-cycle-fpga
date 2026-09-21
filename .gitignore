@@ -1,0 +1,11 @@
+db/
+incremental_db/
+output_files/
+*.rpt
+*.summary
+*.smsg
+*.sof
+*.pin
+*.jdi
+*.done
+*.qws

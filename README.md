@@ -19,7 +19,11 @@ This is Project 4 of the [e-Yantra FPGA Design with Verilog](https://github.com/
 | `data_mem.v` | Byte-addressable RAM, LB/LH/LW/LBU/LHU + SB/SH/SW |
 | `uart_tx.v` | 8N1 UART transmitter |
 | `uart_mmio.v` | Memory-mapped UART peripheral (`sw` to send, `lw` to poll busy) |
-| `riscv_top.v` | Wires all of the above into the full datapath |
+| `fetch_stage.v` | Fetch stage wrapper: `program_counter.v` + `instr_mem.v` + the next-PC mux |
+| `decode_stage.v` | Decode stage wrapper: `main_decoder.v` + `alu_decoder.v` + `reg_file.v` + `imm_gen.v` |
+| `execute_stage.v` | Execute stage wrapper: `alu.v` + `branch_comp.v` + the branch/jump target adder |
+| `memory_stage.v` | Memory stage wrapper: `data_mem.v` + `uart_mmio.v` |
+| `riscv_top.v` | Wires the four stage modules together, plus the write-back mux |
 | `riscv_fpga_top.v` / `.qpf` / `.qsf` / `.sld` | DE0-Nano top level + Quartus project |
 | `tb_riscv_top.v` | Self-checking testbench — 41 checkpoints covering every base RV32I instruction |
 | `tb_hello_uart.v`, `tb_hello_hw_repeat.v` | End-to-end UART output testbenches |
@@ -37,7 +41,8 @@ Requires [Icarus Verilog](http://iverilog.icarus.com/) (or ModelSim-Altera, incl
 ```sh
 iverilog -g2005 -o tb.vvp -s tb_riscv_top \
     alu.v alu_decoder.v main_decoder.v reg_file.v imm_gen.v branch_comp.v \
-    program_counter.v instr_mem.v data_mem.v uart_tx.v uart_mmio.v riscv_top.v \
+    program_counter.v instr_mem.v data_mem.v uart_tx.v uart_mmio.v \
+    fetch_stage.v decode_stage.v execute_stage.v memory_stage.v riscv_top.v \
     tb_riscv_top.v
 vvp tb.vvp
 ```
