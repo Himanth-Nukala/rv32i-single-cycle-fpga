@@ -19,7 +19,7 @@ module riscv_fpga_top (
 
     // GPIO_0_RX is intentionally unused -- see the module comment above.
     // Naming it here (instead of leaving the pin unconstrained) keeps the
-    // physical wiring description in Phase 2 accurate even though nothing
+    // physical wiring description in the book's Task 12 accurate even though nothing
     // in this design reads it yet.
     wire unused_rx = GPIO_0_RX;
 
@@ -32,7 +32,7 @@ module riscv_fpga_top (
     // cycle for `sw`, isn't a pattern Quartus can map onto a block RAM --
     // it has to unroll the whole array into raw logic cells. At 1024
     // bytes that unrolled the array into single-handedly ~30,000+ logic
-    // elements (see Phase 2 build notes) -- more than the EP4CE22 has in
+    // elements (see Task 12, "Fitting a CPU on Real Hardware") -- more than the EP4CE22 has in
     // total. At the size this program actually needs, the same RTL costs
     // only a few thousand.
     riscv_top #(
@@ -46,8 +46,9 @@ module riscv_fpga_top (
         .uart_tx_line (GPIO_0_TX)
     );
 
-    // A visible heartbeat: toggle LED[0] roughly twice a second so it's
-    // obvious at a glance that the CPU's clock is actually running, even
+    // A visible heartbeat: LED[0] is bit 24 of a 50 MHz counter, so it
+    // changes every 2^24 / 50e6 = 0.34 s and completes one on-off blink
+    // every 0.67 s (about 1.5 blinks per second). That makes it obvious at a glance that the CPU's clock is actually running, even
     // before anyone has opened a serial terminal to see the UART output.
     reg [24:0] heartbeat_counter;
     always @(posedge CLOCK_50 or negedge rst_n) begin

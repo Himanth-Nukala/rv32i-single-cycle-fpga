@@ -1,5 +1,5 @@
 // fetch_stage.v -- the Fetch stage: PC register, instruction ROM, and the
-// next-PC mux. See the course book's Task 15 for the full next-PC truth
+// next-PC mux. See the course book's Task 11 for the full next-PC truth
 // table and why the branch/jump target arrives from the Execute stage.
 module fetch_stage #(
     parameter IMEM_FILE  = "hello_uart.hex",

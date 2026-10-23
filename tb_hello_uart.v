@@ -2,11 +2,11 @@
 // that get flashed onto the DE0-Nano: run the CPU with hello.s in
 // instruction memory and the greeting string in data memory, capture every
 // byte it actually transmits over `uart_tx_line` with a real `uart_rx`
-// instance (the same module Task 9/10 verified), and compare the received
+// instance (the same module Task 7 verified), and compare the received
 // string against what we expect character-by-character.
 //
 // This is the closest thing to "testing it on hardware" that's possible
-// before Phase 2 ever touches Quartus: if the CPU, the UART peripheral,
+// before the design ever touches Quartus: if the CPU, the UART peripheral,
 // and the assembled program all agree here, in simulation, at the RTL
 // level, the only things left for hardware to prove are pin mapping and
 // the real board's clock/reset -- not the processor's actual behavior.

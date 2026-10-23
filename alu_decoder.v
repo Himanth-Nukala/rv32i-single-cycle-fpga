@@ -33,12 +33,15 @@ module alu_decoder (
     localparam ALU_SLT  = 4'b1000;
     localparam ALU_SLTU = 4'b1001;
 
-    // funct7b5 only selects SUB (instead of ADD) or SRA (instead of SRL)
-    // when it's actually an R-type instruction. For I-type ALU instructions
-    // (ADDI, SRLI/SRAI are the one exception -- see below), bit 30 of an
-    // I-immediate is just part of the immediate, not a sub-opcode, EXCEPT
-    // Quartus/RISC-V still uses instr[30] for SRLI vs SRAI, so we always
-    // look at it for shifts specifically.
+    // funct7b5 (instr[30]) means different things in different formats.
+    // In an R-type instruction it is the funct7 bit that picks SUB over ADD
+    // and SRA over SRL. In an I-type ALU instruction, bits [31:20] are the
+    // immediate, so for ADDI bit 30 is just an immediate bit: any negative
+    // ADDI immediate (e.g. `addi x6, x0, -3` = 0xffd00313) has it set. That
+    // is why the funct3=000 case also requires op5 (instr[5], 1 only for
+    // R-type), so ADDI is never mistaken for SUB. The shift-immediates are
+    // the exception: SRLI/SRAI put the same funct7 pattern in bits [31:25],
+    // so bit 30 does pick SRAI over SRLI and is used without op5.
     wire is_sub_or_sra = funct7b5;
 
     always @(*) begin

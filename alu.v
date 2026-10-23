@@ -1,7 +1,7 @@
 // alu.v -- 32-bit ALU for the single-cycle RV32I datapath.
 //
 // This is the same "one big case statement on a control code" ALU pattern
-// from Project 1's Task 5/6, just widened to 32 bits and with the extra
+// from Project 1's Task 4, just widened to 32 bits and with the extra
 // operations RV32I needs (shifts, signed/unsigned less-than).
 //
 // alu_control encoding (chosen to match alu_decoder.v):

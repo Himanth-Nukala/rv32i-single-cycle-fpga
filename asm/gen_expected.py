@@ -2,7 +2,7 @@
 """
 Independent reference model for cpu_test.s's 41 checkpoints.
 
-Exactly like task-06's `expected_result` task in the ALU testbench, this is
+Exactly like Task 4's `expected_result` task in the ALU testbench, this is
 a deliberately SEPARATE piece of code from both the assembly program and
 the CPU's RTL -- it recomputes each checkpoint's expected value using
 Python's own arithmetic, so it can catch a real bug in either the assembly
@@ -10,7 +10,7 @@ program's intent or the CPU's implementation, rather than just agreeing
 with whichever one is wrong.
 
 Run this, then feed the resulting expected.hex to tb_riscv_top.v via
-$readmemh, exactly the same file-based-stimulus pattern Task 11 formalized.
+$readmemh, exactly the same file-based-stimulus pattern Task 8 formalized.
 """
 import sys
 
@@ -61,7 +61,7 @@ chk(1 if u32(B) < u32(A) else 0, "sltu x24, x6, x5")
 
 # Section 3: U-type
 chk(0x12345000, "lui x25, 0x12345")
-AUIPC_PC = 256  # byte address of the auipc instruction -- see asm/find_auipc_pc.py
+AUIPC_PC = 256  # byte address of the auipc instruction (instruction index 64 in cpu_test.hex, 64 * 4 = 256)
 chk(AUIPC_PC + (1 << 12), "auipc x26, 1")
 
 # Section 4: Loads/stores
@@ -77,13 +77,14 @@ chk(HALF_VAL, "lhu x31, 8(x27)  -- zero-extended halfword")
 
 # Section 5: Branches -- every "taken" checkpoint expects 101, every
 # "not-taken" checkpoint expects 201 (see cpu_test.s for why).
-for _ in range(6):
-    chk(101, "branch taken")
-    chk(201, "branch not taken")
+for br in ("beq", "bne", "blt", "bge", "bltu", "bgeu"):
+    chk(101, br + " taken")
+    chk(201, br + " not taken")
 
-# Section 6: JAL/JALR call+return
-chk(1, "x20 after returning to call_site")
-chk(1, "x21 inside subroutine")
+# Section 6: JAL/JALR call+return. The subroutine body runs (and stores)
+# before the return does, so x21 is checkpoint 39 and x20 is checkpoint 40.
+chk(1, "jal: x21 set inside subroutine")
+chk(1, "jalr: x20 set after returning to call_site")
 
 
 def main():

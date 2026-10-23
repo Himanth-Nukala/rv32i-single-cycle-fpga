@@ -1,6 +1,6 @@
 // memory_stage.v -- the Memory stage: data RAM and the memory-mapped
 // UART peripheral, sharing one address space. See the course book's
-// Task 17 for the address map and why the UART read-data mux takes
+// Task 12 for the address map and why the UART read-data mux takes
 // priority over ordinary RAM.
 module memory_stage #(
     parameter DMEM_BYTES        = 1024,

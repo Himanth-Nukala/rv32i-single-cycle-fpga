@@ -2,8 +2,8 @@
 //
 // Wires four stage modules together -- Fetch, Decode, Execute, Memory --
 // plus the write-back mux, which is small enough it doesn't need a module
-// of its own. See the course book's Task 15 for the full datapath
-// walkthrough and Task 17 for the memory-mapped UART peripheral.
+// of its own. See the course book's Task 11 for the full datapath
+// walkthrough and Task 12 for the memory-mapped UART peripheral.
 module riscv_top #(
     parameter IMEM_FILE       = "hello_uart.hex",
     parameter IMEM_WORDS      = 256,

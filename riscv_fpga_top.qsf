@@ -23,7 +23,7 @@ set_global_assignment -name VERILOG_FILE riscv_fpga_top.v
 # instr_mem.v / data_mem.v load hello_hw.hex / hello_data.hex with
 # $readmemh, read directly from this project directory -- Quartus bakes
 # their contents into the .sof's initial memory state at compile time,
-# exactly like Task 12's $readmemh-initialized ROM. No separate file
+# exactly like Task 9's $readmemh-initialized ROM. No separate file
 # assignment is needed for them.
 
 # --- 50MHz clock ---

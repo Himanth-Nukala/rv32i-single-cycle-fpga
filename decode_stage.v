@@ -1,6 +1,6 @@
 // decode_stage.v -- the Decode stage: instruction-field extraction, the
 // two-level control decode (main_decoder + alu_decoder), the register
-// file, and immediate generation. See the course book's Task 15 for why
+// file, and immediate generation. See the course book's Task 11 for why
 // decode is split into two decoders and how imm_gen reassembles RV32I's
 // scrambled immediate encoding.
 module decode_stage (

@@ -1,26 +1,26 @@
 // tb_riscv_top.v -- comprehensive, self-checking testbench for the
-// single-cycle RV32I CPU.
+// single-cycle RV32I CPU (book Tasks 11-12).
 //
-// This follows the exact same pattern Task 11 formalized for the rest of
+// This follows the self-checking pattern Task 8 formalized for the rest of
 // this book: a `task automatic` does the checking, `$readmemh` loads the
 // expected values from a file instead of hard-coding them into Verilog,
 // and every mismatch is reported with `$display` before the final
-// pass/fail summary -- "accumulate and report," the same style Task 6's
-// exhaustive ALU testbench and Task 9's UART sweep both use, because this
+// pass/fail summary -- "accumulate and report," the same style Task 4's
+// exhaustive ALU testbench and Task 7's UART sweep both use, because this
 // test is many independent checks (one per instruction/instruction group)
 // rather than a single sequential scenario where an early failure makes
 // every later check meaningless.
 //
 // What's actually being verified: asm/cpu_test.s is a single RV32I
-// program that exercises every base instruction this CPU implements, and
-// logs one 32-bit "checkpoint" result per instruction (or small group of
-// instructions) into sequential data-memory words, starting at address 0.
-// asm/gen_expected.py is a completely independent re-implementation, in
-// Python, of what each of those checkpoints SHOULD be -- exactly the same
-// "independent reference model" idea as Task 6's `expected_result` task,
-// just written in a different language so it can't share a bug with
-// either the assembly program or the CPU RTL. This testbench's only job is
-// to run the program to completion and compare the two.
+// program that exercises every base instruction this CPU implements except
+// `sb` (exercised on hardware as hello_hw.s's UART store), and logs one
+// 32-bit "checkpoint" result per instruction (or small group) into
+// sequential data-memory words, starting at address 0. asm/gen_expected.py
+// independently recomputes, in Python, what each checkpoint SHOULD be --
+// the same "independent reference model" idea as Task 4's `expected_result`
+// task, in a different language so it can't share a bug with either the
+// assembly program or the CPU RTL. This testbench's only job is to run
+// the program to completion and compare the two.
 `timescale 1ns/1ps
 
 module tb_riscv_top;
@@ -61,6 +61,53 @@ module tb_riscv_top;
 
     integer errors;
 
+    // The instruction behind each checkpoint (see asm/cpu_test.s, [chk N]),
+    // so a result names the instruction to fix, not just a number.
+    reg [8*20-1:0] names [0:NUM_CHECKPOINTS-1];
+    initial begin
+        names[ 0] = "addi x5, x0, 5      ";
+        names[ 1] = "addi x6, x0, -3     ";
+        names[ 2] = "andi x7, x5, 3      ";
+        names[ 3] = "ori  x8, x5, 2      ";
+        names[ 4] = "xori x9, x5, 3      ";
+        names[ 5] = "slti x10, x6, 0     ";
+        names[ 6] = "sltiu x11, x6, 5    ";
+        names[ 7] = "slli x12, x5, 2     ";
+        names[ 8] = "srli x13, x6, 4     ";
+        names[ 9] = "srai x14, x6, 4     ";
+        names[10] = "add  x15, x5, x6    ";
+        names[11] = "sub  x16, x5, x6    ";
+        names[12] = "and  x17, x5, x8    ";
+        names[13] = "or   x18, x5, x9    ";
+        names[14] = "xor  x19, x5, x9    ";
+        names[15] = "sll  x20, x5, x7    ";
+        names[16] = "srl  x21, x6, x7    ";
+        names[17] = "sra  x22, x6, x7    ";
+        names[18] = "slt  x23, x6, x5    ";
+        names[19] = "sltu x24, x6, x5    ";
+        names[20] = "lui  x25, 0x12345   ";
+        names[21] = "auipc x26, 1        ";
+        names[22] = "lw   x29, 0(x27)    ";
+        names[23] = "lb   x29, 0(x27)    ";
+        names[24] = "lbu  x29, 0(x27)    ";
+        names[25] = "sh + lh  x31, 8(x27)";
+        names[26] = "sh + lhu x31, 8(x27)";
+        names[27] = "beq (taken)         ";
+        names[28] = "beq (not taken)     ";
+        names[29] = "bne (taken)         ";
+        names[30] = "bne (not taken)     ";
+        names[31] = "blt (taken)         ";
+        names[32] = "blt (not taken)     ";
+        names[33] = "bge (taken)         ";
+        names[34] = "bge (not taken)     ";
+        names[35] = "bltu (taken)        ";
+        names[36] = "bltu (not taken)    ";
+        names[37] = "bgeu (taken)        ";
+        names[38] = "bgeu (not taken)    ";
+        names[39] = "jal  (call lands)   ";
+        names[40] = "jalr (return)       ";
+    end
+
     // Reads one 32-bit checkpoint word directly out of the DUT's data
     // memory array. This is the testbench reaching in with a hierarchical
     // reference (`dut.u_memory.u_data_mem.mem`) rather than going through
@@ -84,8 +131,9 @@ module tb_riscv_top;
             exp = expected[index];
             if (got !== exp) begin
                 errors = errors + 1;
-                $display("[FAIL] checkpoint %0d: got 0x%08h, expected 0x%08h", index, got, exp);
-            end
+                $display("[FAIL] checkpoint %2d  %s  got 0x%08h, expected 0x%08h", index, names[index], got, exp);
+            end else
+                $display("[PASS] checkpoint %2d  %s  0x%08h", index, names[index], got);
         end
     endtask
 
@@ -95,15 +143,15 @@ module tb_riscv_top;
         rst_n = 1'b0;
         errors = 0;
 
-        // Poison the checkpoint region of data memory with a value that
-        // can never look like a correct result (0xA5) before the CPU runs.
-        // Without this, a checkpoint whose EXPECTED value happens to be 0
-        // (like the sltiu/sltu checkpoints below) would silently "pass"
-        // even if the `sw` that was supposed to write it never executed --
-        // data memory already resets to all-zero, so a missing write and a
-        // correct-but-zero write would be indistinguishable. Poisoning
-        // first means every checkpoint is a genuine proof that the CPU
-        // wrote it, not just that memory happened to start out agreeing.
+        // Poison the checkpoint region with 0xA5 (never a correct result)
+        // before the CPU runs. data_mem starts all-zero, so without this a
+        // checkpoint whose EXPECTED value is 0 (the sltiu/sltu ones) would
+        // "pass" even if its `sw` never executed. With it, every checkpoint
+        // is genuine proof that the CPU wrote it. The `#1` waits until every
+        // time-0 `initial` block (including data_mem's zero-fill) has run --
+        // Verilog doesn't define their order -- so the poison always lands
+        // last. Reset is still held until 20 ns, so the CPU hasn't run yet.
+        #1;
         for (k = 0; k < NUM_CHECKPOINTS * 4; k = k + 1)
             dut.u_memory.u_data_mem.mem[k] = 8'hA5;
 

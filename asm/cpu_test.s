@@ -280,13 +280,13 @@ bgeu_nt_ok:
 
     jal  x1, subroutine          # x1 = return address (address of call_site below); jump into the subroutine
 call_site:
-    addi x20, x20, 1               # only reached by actually returning here          [chk 39]
+    addi x20, x20, 1               # only reached by actually returning here          [chk 40]
     sw   x20, 0(x2)
     addi x2, x2, 4
     jal  x0, after_subroutine       # unconditionally skip over the subroutine body
 
 subroutine:
-    addi x21, x21, 1                 # proves the call landed exactly here            [chk 40]
+    addi x21, x21, 1                 # proves the call landed exactly here            [chk 39]
     sw   x21, 0(x2)
     addi x2, x2, 4
     jalr x0, 0(x1)                    # return to call_site, using the saved address in x1

@@ -1,6 +1,6 @@
 // execute_stage.v -- the Execute stage: the ALU and the branch comparator,
 // plus the small ALU-input muxes and the branch/jump target adder. See
-// the course book's Task 15 for why branch_comp is a separate module from
+// the course book's Task 11 for why branch_comp is a separate module from
 // the ALU, and why the target adder runs every cycle, not just on branches.
 module execute_stage (
     input      [31:0] pc,

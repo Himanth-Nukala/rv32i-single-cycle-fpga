@@ -25,7 +25,7 @@ This is Project 4 of the [e-Yantra FPGA Design with Verilog](https://github.com/
 | `memory_stage.v` | Memory stage wrapper: `data_mem.v` + `uart_mmio.v` |
 | `riscv_top.v` | Wires the four stage modules together, plus the write-back mux |
 | `riscv_fpga_top.v` / `.qpf` / `.qsf` / `.sld` | DE0-Nano top level + Quartus project |
-| `tb_riscv_top.v` | Self-checking testbench — 41 checkpoints covering every base RV32I instruction |
+| `tb_riscv_top.v` | Self-checking testbench — 41 checkpoints covering every implemented RV32I instruction except `sb` (which the UART testbenches exercise) |
 | `tb_hello_uart.v`, `tb_hello_hw_repeat.v` | End-to-end UART output testbenches |
 | `asm/assembler.py` | A small two-pass RV32I assembler (this project's own toolchain) |
 | `asm/gen_expected.py` | Independent Python reference model for the testbench's expected values |
@@ -47,7 +47,7 @@ iverilog -g2005 -o tb.vvp -s tb_riscv_top \
 vvp tb.vvp
 ```
 
-Expected output: `RV32I CPU testbench PASSED all 41 checkpoints.`
+Each checkpoint prints one line naming its instruction, for example `[PASS] checkpoint  4  xori x9, x5, 3        0x00000006`. The run ends with: `RV32I CPU testbench PASSED all 41 checkpoints.`
 
 ## Building for hardware
 

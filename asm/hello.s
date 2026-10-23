@@ -6,7 +6,7 @@
 # The string itself isn't in this file -- it's a separate ASCII payload
 # (see gen_string_hex.py) preloaded into data memory starting at address 0
 # via data_mem.v's DMEM_FILE parameter, exactly the same $readmemh
-# separation-of-data-from-logic idea Task 11 taught for testbenches,
+# separation-of-data-from-logic idea Task 8 taught for testbenches,
 # just used here for a real program instead of test stimulus.
 #
 # a0 = pointer into the string (starts at address 0, the string's start)
